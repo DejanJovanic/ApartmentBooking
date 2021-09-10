@@ -1,0 +1,23 @@
+<Admins>
+	<Admin>
+		<Username>Admin1</Username>
+		<Password>admin1</Password>
+		<Name>Admin1</Name>
+		<LastName>Admin1</LastName>
+		<Gender>Male</Gender>
+	</Admin>
+	<Admin>
+		<Username>Admin2</Username>
+		<Password>admin2</Password>
+		<Name>Admin2</Name>
+		<LastName>Admin2</LastName>
+		<Gender>Female</Gender>
+	</Admin>
+	<Admin>
+		<Username>Admin3</Username>
+		<Password>admin3</Password>
+		<Name>Admin3</Name>
+		<LastName>Admin3</LastName>
+		<Gender>Male</Gender>
+	</Admin>
+</Admins>

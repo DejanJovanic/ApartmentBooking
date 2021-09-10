@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="../Content/bootstrap.min.css" type="text/css" />
+    <script src="../Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../Content/bootstrap-clockpicker.min.css" />
+    <script src="../Scripts/bootstrap-clockpicker.min.js"></script>
+    <link href="../Content/datepicker.min.css" rel="stylesheet" type="text/css" />
+    <script src="../Scripts/datepicker.min.js" type="text/javascript"></script>
+    <script src="../Scripts/datepicker.en.js" type="text/javascript"></script>
+    <script src="../Scripts/Validation.js"></script>
+    <link href="../Content/validation.css" rel="stylesheet" type="text/css" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.0/mapsjs-ui.css?dp-version=1549984893" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
+    <script type="text/javascript" src="../Scripts/GeneralApartment.js"></script>
+    <link href="../Content/ApartmentCarousel.css" rel="stylesheet" type="text/css" />
+ 
+    <script>
+    function SendDataAdd(coordinates, address) {
+    var amenitiesRet = []
+    for (var i = 0; i < window.amenities.length; i++) {
+        if ($("#checkbox" + amenities[i]).is(":checked")) {
+            amenitiesRet.push(amenities[i])
+        }
+    }
+
+    var data = new FormData()
+    data.append("Type", $("#type").children("option:selected").val())
+    data.append("RoomNumber", parseInt($("#roomNo").val()))
+    data.append("GuestNumber", parseInt($("#guestNo").val()))
+    data.append("Price", parseFloat($("#price").val()))
+
+
+    data.append("Longitude", coordinates.Longitude)
+    data.append("Latitude", coordinates.Latitude)
+    data.append("Address", address)
+    var dates = $("#date").datepicker().data('datepicker').selectedDates
+    for (var i in dates) {
+        data.append("RentDates", dates[i].toJSON())
+    }
+    for (var i in amenitiesRet) {
+        data.append("Amenities", amenitiesRet[i])
+    }
+
+    data.append("CheckInTime", $("#checkIn").val())
+    data.append("CheckOutTime", $("#checkOut").val())
+ 
+    for (var i in picList) {
+        data.append("Image" + i, picList[i])
+    }
+
+
+    if (sessionStorage.token == null) {
+        alert("Authentification error, please try to login again.")
+    }
+
+    $.ajax({
+        url: "/Apartment/Add",
+        type: "POST",
+        data: data,
+        contentType: false,
+        processData: false,
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.token
+        },
+        success: function (data) {
+             switch (sessionStorage.currentRole.toLowerCase()) {
+                            case "admin": window.location.href = "AdminMain.html"
+                                break
+                            case "guest": window.location.href = "GuestMain.html"
+                                break
+                            case "host": window.location.href = "HostMain.html"
+                                break
+                        }
+        },
+        error: function (jqXHR, error, errorThrown) {
+            if (jqXHR.status && jqXHR.status == 403) {
+                alert("Your account has been blocked");
+                Logout()
+            } else {
+                alert("Something went wrong");
+            }
+        }
+    })
+}
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#apartmentBody").load('ApartmentBody.html', function () {
+                window.isMarkerUserInputed = false
+            window.picList = []
+            window.picFiles = []
+                PrepareGeneral(PictureAddChangeApply, SendDataAdd)
+
+            })   
+        })
+    </script>
+</head>
+<body>
+    <div id="apartmentBody"></div>
+</body>
+</html>

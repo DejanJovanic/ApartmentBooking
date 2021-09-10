@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="~/Content/materialize.min.css" />
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <script>
+        $(document).load(function () {
+            $("#buttonLogin").click(function () {
+                var userName = $("#username").val()
+                if (userName.trim() == "" || userName == null) {
+                    $("#userError").html('<span class="red">Korisnicko mora biti prosledjen</span>')
+                    return;
+                }
+                 var pass = $("#password").val()
+                 if (pass.trim() == "" || pass == null) {
+                    $("#passError").html('<span class="red">Sifra mora biti prosledjena</span>')
+                    return;
+                }
+            })
+            
+
+
+        })
+    </script>
+</head>
+<body>
+    <form>
+        <input type="text" id="username" required />
+        <div id="userError"></div>
+        <input type="password" id="password" required />
+        <div id="passError"></div>
+        <input type="button" id="buttonLogin" value="Login" />
+        <div id="loginError"></div>
+    </form>
+    <script src="~/Scripts/materialize.js"></script>
+</body>
+</html>

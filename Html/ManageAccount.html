@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="../Content/bootstrap.min.css" type="text/css" />
+    <script src="../Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../Content/validation.css" type="text/css" />
+    <script src="../Scripts/Validation.js" type="text/javascript"></script>
+    <script>
+        $(document).ready(function () {
+            $("#content").load("userBody.html", function () {
+
+                $("#heading").text('Modify user')
+                $.ajax({
+                    url: '/Account/GetUserInfo',
+                    method: 'GET',
+                    headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.token
+                     },
+                    success: function (data) {
+                        $("#name").val(data.Name)
+                        $("#lastName").val(data.LastName)
+                        $("#username").val(data.Username)
+                        $("#password").val(data.Password)
+                        window.currentUsername = data.Username
+                        window.currentPassword = data.Password
+                        if (data.Gender === "Male") {
+                            $('input[value="Male"]').prop('checked',true)
+                            $('input[value="Female"]').removeProp('checked')
+                        }
+                        else {
+                            $('input[value="Female"]').prop('checked',true)
+                            $('input[value="Male"]').removeProp('checked')
+                        }
+                    }
+                })
+                $("#username").focusout(function () {
+                    var username = $(this).val()
+                    if (username.trim() != "" && window.currentUsername != username) {
+                        $.get("/Account/IsUsernameTaken?username=" + username, function (data) {
+                            if (data) {
+                                $("#divUsername").addClass('has-error')
+                                $("#divUsername").removeClass('has-success')
+                                $("#usernameIcon").removeClass('validationIconOff')
+                                $("#usernameSuccessIcon").addClass('validationIconOff')
+                                $("#usernameHelp").text('Username is already taken')
+                            }
+                            else {
+                                $("#divUsername").removeClass('has-error')
+                                $("#divUsername").addClass('has-success')
+                                $("#usernameIcon").addClass('validationIconOff')
+                                $("#usernameSuccessIcon").removeClass('validationIconOff')
+                                $("#usernameHelp").text('')
+                            }
+                        })
+                    } else {
+                        $("#divUsername").removeClass('has-error')
+                        $("#divUsername").addClass('has-success')
+                                $("#usernameIcon").addClass('validationIconOff')
+                                $("#usernameSuccessIcon").removeClass('validationIconOff')
+                                $("#usernameHelp").text('')
+                    }
+                       
+                })
+                $("#password").focusout(function () {
+                    var password = $(this).val()
+                    if (password.trim() != "" && window.currentPassword != password) {
+                         $.get("/Account/IsPasswordTaken?password=" + password, function (data) {
+                            if (data) {
+                                $("#divPassword").addClass('has-error')
+                                $("#divPassword").removeClass('has-success')
+                                $("#passwordIcon").removeClass('validationIconOff')
+                                $("#passwordSuccessIcon").addClass('validationIconOff')
+                                $("#passwordHelp").text('Username is already taken')
+                            }
+                            else {
+                                $("#divPassword").removeClass('has-error')
+                                $("#divPassword").addClass('has-success')
+                                $("#passwordIcon").addClass('validationIconOff')
+                                $("#passwordSuccessIcon").removeClass('validationIconOff')
+                                $("#passwordHelp").text('')
+                            }
+                        })
+                    }   
+                    else {
+                        $("#divPassword").removeClass('has-error')
+                        $("#divPassword").addClass('has-success')
+                                $("#passwordIcon").addClass('validationIconOff')
+                                $("#passwordSuccessIcon").removeClass('validationIconOff')
+                                $("#passwordHelp").text('')
+                    }
+                })
+                $('#submitButton').click(function () {
+                    var name = $("#name").val()
+                    var lastName = $("#lastName").val()
+                    var username = $("#username").val()
+                    var password = $("#password").val()
+                var values = [name, lastName, username]
+                var inputNames = ['name', 'lastName', 'username']
+                var regexes = [/^[_A-z]*((-|\s)*[_A-z])*$/g,/^[_A-z]*((-|\s)*[_A-z])*$/g,null]
+                var errors = ['Name may contain only letters','Name may contain only letters',null]
+                    if (Validate(values, inputNames, regexes, errors)) {
+                    var gender = $('input:checked').val()
+                    var data = {OldUsername : window.currentUsername,Name : name, LastName : lastName,Gender:gender, Username : username , Password : password}
+                    $.ajax({
+                        url: '/Account/UpdateAccount',
+                        type: 'POST',
+                        data: JSON.stringify(data),
+                        contentType: "application/json",
+                                     dataType: "json",
+                        success: function () {
+                                 $.ajax({
+                                    url: "/token",
+                                    type:"POST",
+                                    data: { username: username, password: password , grant_type: 'password' },
+                                    contentType: "application/json",
+                                     dataType: "json",
+                                  
+                                    
+                                 }).done(function (token) {
+
+                                     sessionStorage.token = token.access_token
+                                     sessionStorage.currentRole = token.Role
+                                     sessionStorage.user = username
+                                     
+                                     switch (token.Role) {
+                                         case "Admin": window.location.href = "AdminMain.html" 
+                                             break
+                                         case "Guest": window.location.href = "GuestMain.html"
+                                             break
+                                         case "Host": window.location.href = "HostMain.html"
+                                             break
+                                     }
+                                 })
+                           
+                        },
+                        error: function(jqXHR,error, errorThrown) {  
+                              jsonValue = jQuery.parseJSON( jqXHR.responseText );
+                              console.log(jsonValue.Message);
+                          }
+
+                    })
+                }
+            })
+           
+            })
+        })
+    </script>
+</head>
+<body>
+   <div id="content"></div>
+</body>
+</html>

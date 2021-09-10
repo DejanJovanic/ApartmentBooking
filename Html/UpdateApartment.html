@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="../Content/bootstrap.min.css" type="text/css" />
+    <script src="../Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../Content/bootstrap-clockpicker.min.css" />
+    <script src="../Scripts/bootstrap-clockpicker.min.js"></script>
+    <link href="../Content/datepicker.min.css" rel="stylesheet" type="text/css" />
+    <script src="../Scripts/datepicker.min.js" type="text/javascript"></script>
+    <script src="../Scripts/datepicker.en.js" type="text/javascript"></script>
+    <script src="../Scripts/Validation.js"></script>
+    <link href="../Content/validation.css" rel="stylesheet" type="text/css" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.0/mapsjs-ui.css?dp-version=1549984893" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
+    <script type="text/javascript" src="../Scripts/GeneralApartment.js"></script>
+    <link href="../Content/ApartmentCarousel.css" rel="stylesheet" type="text/css" />
+    <script>
+        function ShowAlreadyInCarousel(){
+             var $carousel = $("#picturesInDatabase")
+    $carousel.empty()
+    for (var i = 0; i < window.alreadyIn.length; i += 4) {
+        var item = document.createElement('div')
+        item.classList.add('item')
+        if (i == 0) {
+            item.classList.add('active')
+        }
+        var row = document.createElement('div')
+        row.classList.add('row')
+
+        var col1 = document.createElement('div')
+        col1.classList.add('col-sm-3', 'thumbnail', 'img-wrap')
+        col1.innerHTML = `<img src="${window.alreadyIn[i].Path}" alt="Image" style=" height: 200px; overflow: hidden;" class="img-responsive"/><a href="#myCarousel" class="close" onClick="DeleteModified(this)" link-number="${i}"   addedIndex="${window.alreadyIn[i].ID}">&times;</a>`
+        row.appendChild(col1)
+
+        if (window.alreadyIn[i + 1]) {
+            var col2 = document.createElement('div')
+            col2.classList.add('col-sm-3', 'thumbnail', 'img-wrap')
+            col2.innerHTML = `<img src="${window.alreadyIn[i + 1].Path}" alt="Image" style=" height: 200px; overflow: hidden;"" class="img-responsive"/><a href="#myCarousel" class="close" onClick="DeleteModified(this)" link-number="${i + 1}"  addedIndex="${window.alreadyIn[i + 1].ID}">&times;</a>`
+            row.appendChild(col2)
+
+        }
+        if (window.alreadyIn[i + 2]) {
+            var col3 = document.createElement('div')
+            col3.classList.add('col-sm-3', 'thumbnail', 'img-wrap')
+            col3.innerHTML = `<img src="${window.alreadyIn[i + 2].Path}" alt="Image" style=" height: 200px; overflow: hidden;" class="img-responsive"/><a href="#myCarousel" class="close" onClick="DeleteModified(this)" link-number="${i + 2}"  addedIndex="${window.alreadyIn[i + 2].ID}">&times;</a>`
+            row.appendChild(col3)
+        }
+        if (window.alreadyIn[i + 3]) {
+            var col4 = document.createElement('div')
+            col4.classList.add('col-sm-3', 'thumbnail', 'img-wrap')
+            col4.innerHTML = `<img src="${window.alreadyIn[i + 3].Path}" alt="Image" style=" height: 200px; overflow: hidden;" class="img-responsive"/><a href="#myCarousel" class="close" style="left:2px !important;right:auto !important;" onClick="DeleteModified(this)"  link-number="${i + 3}" addedIndex="${window.alreadyIn[i + 3].ID}">&times;</a>`
+            row.appendChild(col4)
+
+        }
+        item.append(row)
+        $carousel.append(item)
+    }
+        }
+    </script>
+    <script>
+        function DeleteModified(elem) {
+            var index = $(elem).attr("link-number") * 1
+            window.alreadyIn.splice(index, 1)
+            window.deletedID.push($(elem).attr("addedIndex"))
+            ShowAlreadyInCarousel()
+            return false;
+        }
+       
+    </script>
+    <script>
+        function SendDataAdd(coordinates, address) {
+           var amenitiesRet = []
+    for (var i = 0; i < window.amenities.length; i++) {
+        if ($("#checkbox" + amenities[i]).is(":checked")) {
+            amenitiesRet.push(amenities[i])
+        }
+    }
+
+    var data = new FormData()
+    data.append("Type", $("#type").children("option:selected").val())
+    data.append("RoomNumber", parseInt($("#roomNo").val()))
+    data.append("GuestNumber", parseInt($("#guestNo").val()))
+    data.append("Price", parseFloat($("#price").val()))
+
+
+    data.append("Longitude", coordinates.Longitude)
+    data.append("Latitude", coordinates.Latitude)
+    data.append("Address", address)
+    var dates = $("#date").datepicker().data('datepicker').selectedDates
+
+    for (var i in dates) {
+        data.append("RentDates", dates[i].toJSON())
+    }
+    for (var i in amenitiesRet) {
+        data.append("Amenities", amenitiesRet[i])
+    }
+
+    data.append("CheckInTime", $("#checkIn").val())
+    data.append("CheckOutTime", $("#checkOut").val())
+            for (var i in window.deletedID) {
+                data.append("DeletedPictures",parseInt(window.deletedID))
+            }
+            data.append("ID",window.id)
+    for (var i in picList) {
+        data.append("Image" + i, picList[i])
+    }
+
+    $.ajax({
+        url: "/Apartment/Modify",
+        type: "POST",
+        data: data,
+        contentType: false,
+        processData: false,
+        headers: {
+            'Authorization': 'Bearer ' + sessionStorage.token
+        },
+        success: function (data) {
+             switch (sessionStorage.currentRole.toLowerCase()) {
+                            case "admin": window.location.href = "AdminMain.html"
+                                break
+                            case "guest": window.location.href = "GuestMain.html"
+                                break
+                            case "host": window.location.href = "HostMain.html"
+                                break
+                        }
+        },
+        error: function (jqXHR, error, errorThrown) {
+            if (jqXHR.status && jqXHR.status == 403) {
+                alert("Your account has been blocked");
+                Logout()
+            } else {
+                alert("Something went wrong");
+            }
+        }
+    })
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#apartmentBody").load('ApartmentBody.html', function () {
+
+                window.isMarkerUserInputed = false
+                window.picList = []
+                window.picFiles = []
+                window.deletedID = []
+                window.alreadyIn = []
+                PrepareGeneral(PictureAddChangeApply, SendDataAdd)
+                $("#heading").text('Modify apartment')
+                $("#buttonSend").text('Modify apartment')
+                $("#pictureAddRow").before(`
+                    <div class="row" id="addedRow">
+                        <div class="col-sm-6">
+                            <div class="well">
+                                <div id="myCarousel" class="carousel slide">
+                                    <div class="carousel-inner" id="picturesInDatabase"></div>
+                                    <a class="left carousel-control" href="#myCarousel" data-slide="prev">‹</a>
+                                    <a class="right carousel-control" href="#myCarousel" data-slide="next">›</a>
+                                </div>
+                                <!--/myCarousel-->
+                            </div>
+                        </div>
+                    </div>
+`)
+                $("#addedRow").before(`
+                <div class="row">
+                        <div class="col-sm-6">
+                            
+                                <label class="control-label">Images in database</label>
+                                
+                            
+                        </div>
+                    </div>
+`)
+                var url = new URLSearchParams(window.location.search)
+                window.id = url.get('id')
+                $.get('/Apartment/GetApartmentModify?id=' + window.id, function (data) {
+                    $("#type option:selected").prop("selected", false)
+                    $(`#type option[value=${data.Type}]`).prop("selected", true);
+                    $("#price").val(data.Price)
+                    $("#roomNo").val(data.RoomNumber)
+                    $("#guestNo").val(data.GuestNumber)
+                    $("#checkIn").val(data.CheckInTime)
+                    $("#checkOut").val(data.CheckOutTime)
+                    for (var index in data.Amenities) {
+                        $("#checkbox"+data.Amenities[index]).prop('checked',true)
+                    }
+                    var address = data.Location.Address.split(',')
+                    $("#town").val(address[1])
+                    $("#zipCode").val(address[2])
+                    $("#state").val(address[3])
+                    var streetAddress = address[0].split(' ')
+                    $("#streetNo").val(streetAddress[streetAddress.length - 1])
+                    streetAddress.splice(streetAddress.length - 1, 1)
+                    $("#street").val(streetAddress.join(' '))
+                    var dateArray = []
+                    for (var i in data.AvailableDates) {
+                        dateArray.push(new Date(data.AvailableDates[i]))
+                    }
+                    $("#date").datepicker().data('datepicker').selectDate(dateArray)
+                    for (var i in data.Images) {
+                        window.alreadyIn.push(data.Images[i])
+                    }
+                    ShowAlreadyInCarousel()
+                    window.map.setCenter({ lng: data.Location.Longitude, lat: data.Location.Longitude })
+                    window.map.setZoom(14)
+                    window.marker.setPosition({ lng:data.Location.Longitude,lat:data.Location.Longitude})
+                   
+                })
+            })
+        })
+    </script>
+</head>
+<body>
+    <div id="apartmentBody"></div>
+</body>
+</html>

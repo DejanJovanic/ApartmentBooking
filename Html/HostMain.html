@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+    <script src="../Scripts/bootstrap.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../Content/bootstrap.min.css">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.0/mapsjs-ui.css?dp-version=1549984893" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
+    <script src="../Scripts/Display.js"></script>
+    <link rel="stylesheet" href="../Content/ckeckbox-fancy.css" />
+    <script src="../Scripts/checkbox-fancy.js"></script>
+    <script src="../Scripts/SortFilter.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../Content/datepicker.min.css" />
+    <script src="../Scripts/datepicker.min.js"></script>
+    <script src="../Scripts/datepicker.en.js"></script>
+    <script src="../Scripts/ViewActions.js" type="text/javascript"></script>
+    <script src="../Scripts/Bodies.js" type="text/javascript"></script>
+    <style>
+        .row-content {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+
+            $("#usernamePlace").text('  ' + sessionStorage.user)
+            MakeApartmentSearchMain()
+            MakeApartmentFilterMain()
+            MakeSortHost()
+            MakeApartmentStatusFilter();
+            MakeApartmentFilterAmenities();
+
+            $("#checkInPicker").datepicker({
+                language: 'en',
+                minDate: new Date()
+            })
+            $("#checkOutPicker").datepicker({
+                language: 'en',
+                minDate: new Date()
+            })
+            $("#buttonSearch").click(function () {
+                SearchApartment()
+            })
+            $("#buttonFilter").click(function () {
+                window.previewApartments = clone(FilterApartment(window.allApartments))
+                var container = $("#items")
+                container.empty()
+                ShowData(window.previewApartments, container)
+            })
+            MakeApartmentsItemsBody()
+            sessionStorage.currentView = "Apartments"
+              $('#userPreviewModal').on('shown.bs.modal', function (e) {
+                $.ajax({
+                    url: '/Account/GetPreview',
+                    method: 'GET',
+                     headers: {
+                    'Authorization': 'Bearer ' + sessionStorage.token
+                    },
+                    success: function (data) {
+                        $("#previewUsername").text(data.Username)
+                        $("#previewName").text(data.Name)
+                        $("#previewRole").text(data.Role)
+                        $("#previewLastName").text(data.LastName)
+                        $("#previewGender").text(data.Gender)
+                    }
+                })
+            })
+        
+
+        })
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-inverse ">
+        <div class="container-fluid">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a data-toggle="modal" href="#userPreviewModal"><span class="glyphicon glyphicon-user"></span><span id="usernamePlace"></span></a></li>
+                <li><a href="#" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="nav nav-pills nav-justified">
+                    <li id="apartmentsActive" class="active"><a href="#" onclick="ChangeView('Apartments',MakeSortHost)">Apartments</a></li>
+                    <li id="reservationsActive"><a href="#" onclick="ChangeView('Reservations',MakeSort)">Reservations</a></li>
+                </ul>
+            </div>
+        </div>
+        <br />
+        <div class="row" id="sortRow">
+
+        </div>
+        <div class="row row-content">
+            <div class="col-sm-3">
+                <div class="panel-group">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a role="button" class="dropdown-toggle" data-toggle="collapse" href="#SearchPanel">Search</a>
+                            </h4>
+                        </div>
+                        <div id="SearchPanel" class="panel-collapse collapse">
+
+                        </div>
+
+
+                    </div>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a role="button" class="dropdown-toggle" data-toggle="collapse" href="#FilterPanel">Filter</a>
+                            </h4>
+                        </div>
+                        <div id="FilterPanel" class="panel-collapse collapse">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="container-fluid">
+
+                <div id="itemsHolder" class="row">
+
+                </div>
+
+            </div>
+
+
+            <div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="previewModalLabel">Apartment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div id="type" class="col-sm-8"></div>
+                                    <div id="price" class="col-sm-4"></div>
+                                </div>
+                                <div class="row">
+                                    <div id="roomNo" class="col-sm-8"></div>
+                                    <div id="guestNo" class="col-sm-4"></div>
+                                </div>
+                                <div class="row">
+                                    <div id="checkIn" class="col-sm-8"></div>
+                                    <div id="checkOut" class="col-sm-4"></div>
+                                </div>
+                                <div id="amenitiesContainer" class="row container-fluid">
+                                    <div class="row" id="amenitiesLabel">
+                                        <div class="col-sm-12">
+                                            <p>Amenities</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div id="address" class="col-sm-12"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-9">
+                                        <div id="map" style="height:300px;width:100%"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-10 col-xs-offset-1">
+                                        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                                            <!-- Wrapper for slides -->
+                                            <div class="carousel-inner" style=" width:100%; height: 500px !important;" role="listbox">
+
+                                            </div>
+                                            <!-- Left and right controls -->
+                                            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                                                <span class="glyphicon glyphicon-chevron-left"></span>
+                                                <span class="sr-only">Previous</span>
+                                            </a>
+                                            <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                                <span class="sr-only">Next</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="previewCommentsHeading" class="col-sm-10"></div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div id="previewComments" class="col-sm-12 container-fluid"></div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer" id="previewFooter"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="commentAllModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Comments</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <td>User</td>
+                                                <td>Rate</td>
+                                                <td>Text</td>
+                                                <td>&nbsp;</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="commentsContent"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="userPreviewModal" tabindex="-1" role="dialog" aria-labelledby="userPreviewModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Username<br /><span id="previewUsername" class="lead"></span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Name<br /><span id="previewName" class="lead"></span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Last Name<br /><span id="previewLastName" class="lead"></span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Gender<br /><span id="previewGender" class="lead"></span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Role<br /><span id="previewRole" class="lead"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <a href="ManageAccount.html" class="btn btn-primary">Update Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

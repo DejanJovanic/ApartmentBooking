@@ -1,0 +1,45 @@
+﻿<html>
+<head>
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#Upload").click(function () {
+                var files = $("#file1").get(0).files
+                var data = {}
+                data.RoomNumber = $('#RoomNumber').val()
+                data.GuestNumber = $('#GuestNumber').val()
+                data.Price = $('#Price').val()
+                data.Images = []
+                
+                var i
+                for (i = 0; i < files.length;i++) {
+                    var file = files[i]
+                    var reader = new FileReader()
+                    reader.onload = () => data.Images.push(reader.result.split(',')[1])
+                    reader.readAsDataURL(file)  
+                }
+                while (data.Images.length != files.length);
+
+                var send = JSON.stringify(data)
+                $.ajax({
+                    url: "/api/send/add",
+                    data: send,
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json"
+                })
+            })
+        })
+    </script>
+</head>
+<body>
+    <form id="Input">
+        <input id="RoomNumber" type="number" />
+        <input id="GuestNumber" type="number" />
+        <input type="file" id="file1" multiple="multiple" accept=".jpg, .jpeg" />
+        <input type="number" id="Price" />
+        <input type="button" id="Upload" />
+    </form>
+</body>
+</html>
+

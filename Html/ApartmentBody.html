@@ -1,0 +1,186 @@
+﻿<nav class="navbar navbar-inverse ">
+    <div class="container-fluid">
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 col-sm-offset-2">
+            <h4 class="title" id="heading">Add apartment</h4>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-sm-12 col-sm-offset-2">
+            <div class="container-fluid">
+                <form role="form">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Apartment type</label>
+                                <select id="type" class="form-control">
+                                    <option value="Whole">Whole apartment</option>
+                                    <option value="Room">Room</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div id="divPrice" class="form-group has-feedback">
+                                <label for="price" class="control-label">Price &euro;/night</label>
+                                <input type="text" id="price" class="form-control" />
+                                <span id="priceIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="priceHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div id="divRoomNo" class="form-group has-feedback">
+                                <label for="roomNo" class="control-label">Room number</label>
+                                <input type="text" id="roomNo" class="form-control" />
+                                <span id="roomNoIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="roomNoHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div id="divGuestNo" class="form-group  has-feedback">
+                                <label for="roomNo" class="control-label">Guest number</label>
+                                <input type="text" id="guestNo" class="form-control " />
+                                <span id="guestNoIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="guestNoHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Check in time</label>
+                                <div class="input-group clockpicker" data-autoclose="true">
+                                    <input id="checkIn" type="text" class="form-control" value="14:00">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-time"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Check out time</label>
+                                <div class="input-group clockpicker" data-autoclose="true">
+                                    <input type="text" id="checkOut" class="form-control" value="10:00">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-time"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label class="control-label">Amenities</label>
+                            <div id="amenitiesCheckBoxes" class="container-fluid form-group">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div id="divStreet" class="form-group has-feedback">
+                                <label for="street" class="control-label">Street</label>
+                                <input type="text" id="street" class="form-control" />
+                                <span id="streetIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="streetHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="divStreetNo" class="form-group has-feedback">
+                                <label for="streetNo" class="control-label">Street number</label>
+                                <input type="text" id="streetNo" class="form-control" />
+                                <span id="streetNoIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="streetNoHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="divTown" class="form-group has-feedback">
+                                <label for="town" class="control-label">City/Town</label>
+                                <input type="text" id="town" class="form-control" />
+                                <span id="townIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="townHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div id="divState" class="form-group has-feedback">
+                                <label for="state" class="control-label">Country/State</label>
+                                <input type="text" id="state" class="form-control" />
+                                <span id="stateIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="stateHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="divZipCode" class="form-group has-feedback">
+                                <label for="zipCode" class="control-label">Zip code</label>
+                                <input type="text" id="zipCode" class="form-control" />
+                                <span id="zipCodeIcon" class="glyphicon glyphicon-remove form-control-feedback validationIconOff"></span>
+                                <small id="zipCodeHelp" class="help-block text-danger"></small>
+                            </div>
+                        </div>
+                        <div class=" col-sm-1">
+                            <div class="form-group">
+                                <label for="buttonMap" class="control-label">&nbsp;</label>
+                                <button id="buttonMap" class="btn btn-info form-control" type="button">Check on map</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div id="map" style="height:250px;"></div>
+                            <small>(Map showing wrong marker? Click on map to put marker in right position.)</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Rent Dates</label>
+                                <div class="datepicker-here" data-multiple-dates="true" id="date" data-language="en"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="pictureAddRow">
+                        <div class="col-sm-6">
+                            <label class="btn btn-primary">
+                                Add picture <input id="picture" class="validationIconOff" type="file" hidden />
+                            </label>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row" >
+                        <div class="col-sm-6">
+                            <div class="well">
+                                <div id="myCarousel" class="carousel slide">
+                                    <div class="carousel-inner" id="pictures"></div>
+                                    <a class="left carousel-control" href="#myCarousel" data-slide="prev">‹</a>
+                                    <a class="right carousel-control" href="#myCarousel" data-slide="next">›</a>
+                                </div>
+                                <!--/myCarousel-->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-sm-12">
+                        &nbsp;
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <button id="buttonSend" class="btn btn-primary">Add apartment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
